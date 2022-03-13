@@ -1,0 +1,5 @@
+query for manage order
+select o.order_id, c.name, o.tot_amount from customer c, orders o where c.phone=o.cust_id;
+
+query for view order
+select m.item_name, b.quantity, m.price*b.quantity as price from menu m, bill b, orders o where b.item_id = m.item_id and o.order_id=1007;

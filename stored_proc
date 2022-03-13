@@ -1,0 +1,40 @@
+delimiter //
+create procedure updatebill()
+begin
+
+declare c_a int;
+declare c_b int;
+declare done int;
+declare c1 cursor for
+select b.order_id, (b.quantity * m.price) as rate from bill b, menu m where b.item_id = m.item_id; 
+declare continue handler for not found set done=1;
+set done=0;
+update orders set tot_amount=0;
+open c1;
+loop1: loop
+if done=1 then
+leave loop1;
+end if;
+fetch c1 into c_a, c_b;
+update orders set tot_amount = tot_amount + c_b where order_id = c_a;
+end loop;
+update orders set tot_amount = tot_amount - c_b where order_id = c_a;
+close c1;
+end
+//
+
+delimiter ;
+
+
+
+CREATE TRIGGER insertLog
+AFTER INSERT ON
+orders FOR EACH ROW
+INSERT INTO log VALUES (new.order_id, 'Order Created', CURRENT_TIMESTAMP());
+
+CREATE TRIGGER updateLog
+AFTER UPDATE ON
+orders FOR EACH ROW
+INSERT INTO log VALUES (old.order_id, 'Order Updated', CURRENT_TIMESTAMP());
+
+
